@@ -218,4 +218,145 @@ alter table public.tasks   enable row level security;
 
 - RLS를 켜면 **"누가 어떤 행을 볼 수 있는지" 규칙(policy)을 만들기 전까지는 아무도 데이터를 못 본다.**
 - 그래서 앱에서 조회했는데 데이터가 있는데도 `[]` 가 나오면, 코드 버그가 아니라 **정책이 없어서**다.
-- 로그인이 Clerk이라서, Supabase가 Clerk 로그인 정보를 알아볼 수 있게 연결해야 "내 보드만 보기" 같은 정책을 쓸 수 있다. 다음 단계에서 다룬다.
+- 그래서 테이블마다 **SELECT(조회), INSERT(추가), UPDATE(수정), DELETE(삭제)** 정책을 하나씩, 모두 12개 만든다.
+
+---
+
+## 9. RLS 정책 만들기 — SQL Editor
+
+Supabase 대시보드의 **SQL Editor**에서 실행했다.
+
+### `boards` — 내 보드만
+
+`boards` 에는 주인을 나타내는 `user_id` 가 바로 있으니, 그 값과 로그인한 사람의 ID를 비교하면 된다.
+
+```sql
+CREATE POLICY "Users can view their own boards" ON boards
+  FOR SELECT USING (auth.uid()::text = user_id);
+
+CREATE POLICY "Users can insert their own boards" ON boards
+  FOR INSERT WITH CHECK (auth.uid()::text = user_id);
+
+CREATE POLICY "Users can update their own boards" ON boards
+  FOR UPDATE USING (auth.uid()::text = user_id);
+
+CREATE POLICY "Users can delete their own boards" ON boards
+  FOR DELETE USING (auth.uid()::text = user_id);
+```
+
+- `auth.uid()` 는 **지금 로그인한 사람의 ID**를 돌려주는 Supabase 함수다.
+- `::text` 는 그 값을 `text` 로 바꾼다. `user_id` 컬럼이 `text` 라서 타입을 맞춘다.
+
+### `columns` — 내 보드에 있는 리스트만
+
+`columns` 에는 `user_id` 가 없다. 그래서 `board_id` 로 **보드를 찾아가서** 그 보드의 주인을 확인한다.
+
+```sql
+CREATE POLICY "Users can view columns from their own boards" ON columns
+  FOR SELECT USING(
+    EXISTS (
+      SELECT 1 FROM boards
+      WHERE boards.id = columns.board_id
+      AND boards.user_id = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Users can insert columns into their own boards" ON columns
+  FOR INSERT WITH CHECK(
+    EXISTS (
+      SELECT 1 FROM boards
+      WHERE boards.id = columns.board_id
+      AND boards.user_id = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Users can update columns from their own boards" ON columns
+  FOR UPDATE USING(
+    EXISTS (
+      SELECT 1 FROM boards
+      WHERE boards.id = columns.board_id
+      AND boards.user_id = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Users can delete columns from their own boards" ON columns
+  FOR DELETE USING(
+    EXISTS (
+      SELECT 1 FROM boards
+      WHERE boards.id = columns.board_id
+      AND boards.user_id = auth.uid()::text
+    )
+  );
+```
+
+- `EXISTS (SELECT 1 FROM ... )`: 괄호 안 조건에 맞는 행이 **하나라도 있으면 참**이다. `SELECT 1` 은 값은 필요 없고 "있는지"만 본다는 뜻이다.
+- 즉 "이 리스트의 `board_id` 에 해당하는 보드가 있고, 그 보드의 주인이 나인가?"를 확인한다.
+
+### `tasks` — 내 보드에 있는 카드만
+
+`tasks` 는 한 단계 더 멀다. **카드 → 리스트(`column_id`) → 보드(`board_id`) → 주인(`user_id`)** 순서로 따라간다.
+
+```sql
+CREATE POLICY "Users can view tasks from their own boards" ON tasks
+  FOR SELECT USING(
+    EXISTS (
+      SELECT 1 FROM columns
+      JOIN boards ON boards.id = columns.board_id
+      WHERE columns.id = tasks.column_id
+      AND boards.user_id = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Users can insert tasks into their own boards" ON tasks
+  FOR INSERT WITH CHECK(
+    EXISTS (
+      SELECT 1 FROM columns
+      JOIN boards ON boards.id = columns.board_id
+      WHERE columns.id = tasks.column_id
+      AND boards.user_id = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Users can update tasks from their own boards" ON tasks
+  FOR UPDATE USING(
+    EXISTS (
+      SELECT 1 FROM columns
+      JOIN boards ON boards.id = columns.board_id
+      WHERE columns.id = tasks.column_id
+      AND boards.user_id = auth.uid()::text
+    )
+  );
+
+CREATE POLICY "Users can delete tasks from their own boards" ON tasks
+  FOR DELETE USING(
+    EXISTS (
+      SELECT 1 FROM columns
+      JOIN boards ON boards.id = columns.board_id
+      WHERE columns.id = tasks.column_id
+      AND boards.user_id = auth.uid()::text
+    )
+  );
+```
+
+- `JOIN boards ON boards.id = columns.board_id`: 리스트 테이블에 보드 테이블을 이어 붙여서, 리스트와 그 리스트가 속한 보드를 한 줄로 본다.
+- 그래서 `tasks` 테이블에 `column_id` 가 꼭 필요했다(6번 참고).
+
+### `USING` 과 `WITH CHECK` 차이
+
+| | 언제 | 뜻 |
+|---|---|---|
+| `USING` | SELECT, UPDATE, DELETE | **이미 있는 행** 중에서 내가 볼 수 있거나 손댈 수 있는 행을 고르는 조건 |
+| `WITH CHECK` | INSERT | **새로 넣으려는 행**이 조건에 맞는지 저장하기 전에 검사 |
+
+> **막혔던 부분**
+> - **주석은 `--` 두 개.** 한 문장씩 실행하려고 나머지를 주석으로 막았는데, 실수로 `-` 하나만 쓴 줄이 있어서 문법 에러가 났다.
+> - **문장 끝에 `;`.** 여러 문장을 한 번에 실행하면 `;` 로 끝을 표시해야 한다. 빠지면 `syntax error at or near "CREATE"` 가 난다.
+> - **`column` 이 아니라 `columns`.** 테이블 이름에서 s를 빼먹었는데, `column` 은 SQL 예약어라서 문법 에러가 났다.
+> - **`tasks.column_id` 가 없다는 에러.** 테이블을 만들 때 `column_id` 를 안 넣어서 `tasks` 정책을 만들 수 없었다. 컬럼을 추가하고 다시 실행했다.
+> - **팁:** SQL Editor에서 실행할 부분만 **마우스로 선택하고 Run(`Cmd+Enter`)** 하면 선택한 부분만 실행된다. 매번 주석으로 막지 않아도 된다.
+
+> **확인 필요 — Clerk과 `auth.uid()`**
+> - `auth.uid()` 는 로그인 토큰의 사용자 ID를 **`uuid` 타입으로 바꿔서** 돌려준다.
+> - 그런데 Clerk 사용자 ID는 `user_2abc...` 형식이라 uuid가 아니다. Supabase 문서도 uuid가 아닌 ID를 쓰는 서비스는 `auth.uid()` 대신 `auth.jwt()->>'sub'` 를 쓰라고 안내한다.
+> - 이번에는 영상대로 `auth.uid()` 로 만들었다. 실제로 데이터를 조회할 때 `invalid input syntax for type uuid` 에러가 나면 이 부분을 고친다.
+> - 그리고 Supabase가 Clerk 로그인을 알아보려면 Supabase에 Clerk을 연결하는 설정도 해야 한다. 다음 단계에서 다룬다.
