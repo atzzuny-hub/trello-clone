@@ -11,7 +11,8 @@
 |---|---|---|---|
 | `00:06:00` Next.js App Bootstrapping & Dev Server | create-next-app, Navbar, 메인 페이지 | 완료 | [docs/post-01-setup.md](docs/post-01-setup.md) |
 | `00:20:00` Installing Core Dependencies & UI Libraries | 패키지·shadcn 설치, Clerk 로그인, `/dashboard` | 완료 | [docs/post-02-clerk.md](docs/post-02-clerk.md) |
-| 다음 | `/dashboard` 로그인 보호, Supabase 연결 | 예정 | |
+| `00:35:00` | Supabase 프로젝트 생성, `boards`·`columns`·`tasks` 테이블 설계 | 완료 | [docs/post-03-supabase-tables.md](docs/post-03-supabase-tables.md) |
+| 다음 | `/dashboard` 로그인 보호, Supabase 클라이언트 연결·RLS 정책 | 예정 | |
 
 ### 다음에 할 일
 
