@@ -89,6 +89,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=ey***
 | `description` | `text` | - | 보드 설명 |
 | `color` | `text` | - | 보드 색상. 대시보드에서 보드를 구별하는 데 쓴다. |
 | `user_id` | `text` | - | 이 보드를 만든 사람의 **Clerk 사용자 ID** |
+| `updated_at` | `timestamptz` | `now()` | 보드를 마지막으로 수정한 시각 (나중에 추가) |
+
+**`updated_at` — 나중에 추가했다**
+- 타입을 정의하다가 "언제 수정됐는지"를 확인할 컬럼이 필요해서 추가했다.
+- 주의: `default now()` 는 **행을 처음 만들 때만** 시각을 넣는다. 보드를 수정해도 `updated_at` 은 **저절로 바뀌지 않는다.** 수정할 때 코드에서 값을 직접 넣거나, DB 트리거를 만들어야 한다.
 
 **`user_id` 가 `text` 인 이유**
 - Clerk 사용자 ID는 `user_2abc...` 처럼 **문자열**이다. 숫자(`int8`)나 `uuid` 타입으로 만들면 저장할 수 없다.
@@ -176,7 +181,8 @@ create table public.boards (
   title text,
   description text,
   color text,
-  user_id text
+  user_id text,
+  updated_at timestamptz default now()
 );
 
 create table public.columns (
