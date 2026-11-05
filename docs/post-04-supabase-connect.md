@@ -446,6 +446,50 @@ const handleCreateBoard = async () => {
 </Button>
 ```
 
+### 5-1. 대시보드에 들어오면 내 보드 불러오기 — `loadBoards`
+
+Supabase 세팅의 마지막 조각이다. 저장(`createBoard`)만 있던 훅에 **불러오기**를 붙였다.
+
+`lib/hooks/useBoards.ts` (추가한 부분)
+
+```ts
+import { useEffect, useState } from "react";
+import { boardDataService, boardService } from "../services";
+
+// ... useState 들 아래
+
+useEffect(()=>{
+    if(user) {
+        loadBoards()
+    }
+},[user, supabase])
+
+async function loadBoards() {
+    if(!user) return
+
+    try{
+        setLoading(true)
+        setError(null)
+        const data = await boardService.getBoards(supabase!, user.id)
+        setBoards(data)
+    }catch(err){
+        setError(err instanceof Error ? err.message : "보드를 불러오지 못했습니다.")
+    }finally{
+        setLoading(false)
+    }
+}
+```
+
+- `useEffect(..., [user, supabase])`: 화면이 처음 뜰 때, 그리고 `user` 나 `supabase` 가 바뀔 때 안의 코드를 실행한다. Clerk 사용자 정보는 조금 늦게 도착하므로 `if(user)` 로 도착한 뒤에만 불러온다.
+- `boardService.getBoards(supabase!, user.id)`: 4번에서 만든 함수. `user_id` 가 내 Clerk ID인 보드를 최신순으로 가져온다. RLS 정책도 같은 조건이라 남의 보드는 애초에 오지 않는다.
+- `setLoading(true)` → 끝나면 `finally` 에서 `setLoading(false)`: 성공하든 실패하든 "불러오는 중" 표시를 끝낸다.
+- `supabase!`: Provider가 클라이언트를 다 만든 뒤에야 `children` 을 보여 주므로(3번), 여기서는 `null` 이 아니라고 TypeScript에 알려 준다.
+- 아직 `boards` 를 화면에 그리지는 않는다. 목록 UI는 다음 편에서 만든다.
+
+> **영상과 다른 점**
+> - 영상에는 `columnService` 안에도 `getBoards` 가 있다. `boardService.getBoards` 와 하는 일이 같고 아무 데서도 쓰지 않아서 **주석 처리**했다.
+> - 우리 코드에서는 이 함수가 타입 에러를 낸다(7번 ⑤). 영상은 파일 맨 위 `const supabase = createClient()` 를 그대로 쓰기 때문에 에러가 나지 않았던 것으로 보인다.
+
 ---
 
 ## 6. Supabase 설정 — 검문소 네 개 통과하기
@@ -611,6 +655,9 @@ to authenticated;
 | `'supabase' does not exist in type ...` | `createContext<SupabaseClient>` 로 상자 타입을 잘못 지정 | `createContext<SupabaseContext>` |
 | `useContext(context)` 에러 | 변수 이름 대소문자 | `useContext(Context)` |
 | `createClient` 인자 개수 에러 | 인자 없는 `./client` 의 `createClient` 를 import | `@supabase/supabase-js` 에서 import |
+| ⑤ `Cannot find name 'supabase'` (`services.ts`) | `columnService.getBoards` 가 옛날 방식이라 `supabase` 를 인자로 받지 않음. 파일 맨 위 `const supabase` 는 주석 처리돼 있음 | `boardService.getBoards` 와 중복이라 주석 처리 (5-1) |
+
+> **`npm run dev` 는 타입 에러가 있어도 돌아간다.** 개발 서버는 타입 검사 없이 타입 표시만 지우고 실행하기 때문이다. 그래서 에디터의 빨간 줄을 무시하고 넘어가기 쉽다. 하지만 `npm run build` 는 타입 검사를 해서 실패한다. 수정 후에는 `npx tsc --noEmit` 으로 확인하자.
 
 ### Supabase 에러 — 하나 고치면 다음 게 나왔다
 
