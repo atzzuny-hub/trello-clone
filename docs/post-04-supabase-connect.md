@@ -87,6 +87,7 @@ export interface Column{
     title: string;
     sort_order: number;
     created_at: string;
+    user_id: string;
 }
 
 export interface Task{
@@ -107,6 +108,7 @@ export interface Task{
 - `string | null`: 비어 있을 수 있는 컬럼(Is Nullable 체크한 컬럼).
 - 날짜(`created_at`, `due_date`)도 JSON으로 오면 문자열이라 `string`.
 - `priority` 는 세 값 중 하나만 오도록 좁혔다.
+- `Column` 의 `user_id` 는 영상 중간에 추가하라고 해서 넣었다. Supabase `columns` 테이블에도 같은 이름의 컬럼을 만들어야 한다(4-1).
 
 > **영상과 다른 점**
 > - `Board` 에 `updated_at` 을 추가했다. (3)편에서 `boards` 테이블에 `updated_at` 컬럼을 추가했기 때문이다.
@@ -343,7 +345,11 @@ export const boardDataService = {
 
         await Promise.all(
             defaultColumns.map((column) =>
-                columnService.createColumn(supabase, { ...column, board_id: board.id })
+                columnService.createColumn(supabase, {
+                    ...column,
+                    board_id: board.id,
+                    user_id: boardData.userId
+                })
             )
         )
 
@@ -363,6 +369,18 @@ export const boardDataService = {
 
 > **영상과 다른 점**
 > - 영상은 처음에 파일 맨 위에서 `const supabase = createClient()` 로 만들어 썼다. Clerk 토큰을 붙이려면 훅(`useSession`)이 필요해서, **각 함수가 `supabase` 를 인자로 받도록** 바꿨다.
+
+### 4-1. 리스트(`columns`)에도 `user_id` 저장하기
+
+영상 중간에 리스트에도 주인(`user_id`)을 적어 두라고 해서 따라 했다.
+
+1. **Supabase Table Editor → `columns` 테이블 → 컬럼 추가**: 이름 `user_id`, 타입 `text`.
+   `boards.user_id` 와 같은 Clerk 사용자 ID(`user_3LXz...`) 문자열이 들어간다.
+2. **`models.ts`**: `Column` 에 `user_id: string` 추가 (1번 코드).
+3. **`services.ts`**: 기본 리스트 4개를 만들 때 `user_id: boardData.userId` 를 함께 넣는다 (위 코드).
+
+- 지금 RLS 정책(6-3)은 여전히 `boards` 를 거쳐서 주인을 확인한다. 그래서 `columns.user_id` 는 아직 정책에서 쓰이지 않는다. 저장만 해 두는 상태다.
+- 컬럼 이름은 **DB와 코드에서 글자 하나까지 똑같아야** 한다. 대소문자도 구분한다. 여기서 한 번 막혔다(7번 ④).
 
 ---
 
@@ -616,6 +634,13 @@ to authenticated;
 - 이대로면 보드는 저장되고, 이어서 리스트를 넣을 때 `... for table "columns"` 에러가 난다.
 - 주석을 풀고(`Cmd + /`) 실행 → 해결.
 
+**④ `columns` 에 `user_id` 를 넣었더니 에러 — `user_Id` 오타**
+
+- 4-1에서 코드에 `user_Id`(가운데 `I` 가 대문자)로 적었다. DB 컬럼은 `user_id` 다.
+- Postgres는 컬럼 이름의 대소문자를 구분한다. 그래서 Supabase는 `user_Id` 라는 컬럼이 없다며 저장을 거절한다.
+- **`npx tsc --noEmit` 은 통과했다.** `models.ts` 와 `services.ts` 양쪽에 똑같이 `user_Id` 로 적어서, TypeScript가 보기엔 서로 맞았기 때문이다. 타입은 DB를 모른다. 타입을 DB 컬럼 이름과 맞추는 건 직접 해야 한다.
+- 두 파일 모두 `user_id` 로 고쳐서 해결.
+
 ### 디버깅에 쓴 것들
 
 - **Network 탭 → Response**: Supabase가 돌려준 `code`, `message` 를 본다. 403이라도 `message` 가 다르면 원인이 다르다.
@@ -640,7 +665,7 @@ to authenticated;
 **Create Board** 를 누르면 Supabase **Table Editor** 에서
 
 - `boards` 에 `New Board` 1줄 (`user_id` = 내 Clerk ID)
-- `columns` 에 To Do / In Progress / Review / Done 4줄 (`board_id` = 방금 만든 보드)
+- `columns` 에 To Do / In Progress / Review / Done 4줄 (`board_id` = 방금 만든 보드, `user_id` = 내 Clerk ID)
 
 이 생긴다. 🎉
 
