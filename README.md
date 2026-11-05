@@ -12,12 +12,13 @@
 | `00:06:00` Next.js App Bootstrapping & Dev Server | create-next-app, Navbar, 메인 페이지 | 완료 | [docs/post-01-setup.md](docs/post-01-setup.md) |
 | `00:20:00` Installing Core Dependencies & UI Libraries | 패키지·shadcn 설치, Clerk 로그인, `/dashboard` | 완료 | [docs/post-02-clerk.md](docs/post-02-clerk.md) |
 | `00:35:00` | Supabase 프로젝트 생성, `boards`·`columns`·`tasks` 테이블 설계 | 완료 | [docs/post-03-supabase-tables.md](docs/post-03-supabase-tables.md) |
-| 다음 | `/dashboard` 로그인 보호, Supabase 클라이언트 연결·RLS 정책 | 예정 | |
+| `??:??:??` | Supabase 클라이언트·Provider·services, Clerk 연동, RLS 정책 수정 → Create Board 저장 성공 | 완료 | [docs/post-04-supabase-connect.md](docs/post-04-supabase-connect.md) |
+| 다음 | 대시보드에 보드 목록 불러오기(`getBoards`), `/dashboard` 로그인 보호 | 예정 | |
 
 ### 다음에 할 일
 
 - [ ] `middleware.ts` 에서 `createRouteMatcher` + `auth.protect()` 로 `/dashboard` 보호하기 (지금은 로그아웃 상태에서도 열림)
-- [ ] Supabase 프로젝트 만들고 연결하기
+- [x] Supabase 프로젝트 만들고 연결하기
 - [ ] 보드·리스트·카드 CRUD
 - [ ] dnd-kit 드래그 앤 드롭
 - [ ] 완성 후: Clerk → Supabase Auth 로 바꾸기, Next.js 16 업그레이드
