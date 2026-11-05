@@ -101,7 +101,7 @@ export const boardDataService = {
                     board_id: board.id, 
                     user_id: boardData.userId 
                 })
-            )
+            ) 
         )
 
         return board
