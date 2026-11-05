@@ -96,7 +96,11 @@ export const boardDataService = {
 
         await Promise.all(
             defaultColumns.map((column) =>
-                columnService.createColumn(supabase, { ...column, board_id: board.id })
+                columnService.createColumn(supabase, { 
+                    ...column, 
+                    board_id: board.id, 
+                    user_id: boardData.userId 
+                })
             )
         )
 
