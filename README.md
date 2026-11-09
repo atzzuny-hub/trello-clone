@@ -15,6 +15,7 @@
 | `??:??:??` | Supabase 클라이언트·Provider·services, Clerk 연동, RLS 정책 수정 → Create Board 저장·내 보드 불러오기(`loadBoards`) | 완료 | [docs/post-04-supabase-connect.md](docs/post-04-supabase-connect.md) |
 | `01:57:35` | 대시보드 메인 화면 — 통계 카드, 그리드/리스트 전환, 검색창(모양만) | 완료 | [docs/post-05-dashboard.md](docs/post-05-dashboard.md) |
 | `02:32:00` | 보드 상세 페이지(`/boards/[id]`) — 보드·컬럼 불러오기(`useBoard`), 보드용 Navbar 헤더 | 완료 | [docs/post-06-board-page.md](docs/post-06-board-page.md) |
+| `??:??:??` | 보드 수정 Dialog — 제목·색상 변경(`updateBoard`), 새 컴퓨터 설정 에러 정리 | 완료 | [docs/post-07-edit-board-dialog.md](docs/post-07-edit-board-dialog.md) |
 | 다음 | 보드 상세에 컬럼 그리기, 검색·필터, 새 보드 Dialog, `/dashboard` 로그인 보호 | 예정 | |
 
 ### 다음에 할 일
