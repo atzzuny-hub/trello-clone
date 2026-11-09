@@ -90,10 +90,26 @@ export function useBoard(boardId: string){
         }
     }
 
+    async function updateBoard(boardId: string, updates: Partial<Board>) {
+        try{
+            const updateBoard = await boardService.updateBoard(
+                supabase!,
+                boardId,
+                updates
+            )
+            setBoard(updateBoard)
+            return updateBoard
+
+        }catch(err){
+            setError(err instanceof Error ? err.message : "보드 업데이트에 실패했습니다.")
+        }
+    }
+
     return{
         board,
         columns,
         loading,
-        error
+        error,
+        updateBoard
     }
 }
