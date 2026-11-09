@@ -17,12 +17,22 @@ const Context = createContext<SupabaseContext>({
 
 export default function SupabaseProvider({children}:{children:React.ReactNode}){
 
-    const {session} = useSession();
+    const {session, isLoaded: isSessionLoaded} = useSession();
     const [supabase, setSupabase] = useState<SupabaseClient | null>(null)
     const [isLoaded, setIsLoaded] = useState<boolean>(false)
 
     useEffect(()=>{
-        if(!session) return;
+        // if(!session) return;
+
+        // Clerk가 로그인 상태를 아직 확인하는 중이면 기다린다
+        if(!isSessionLoaded) return;
+
+        // 로그아웃 상태면 Supabase 없이 화면을 보여 준다 (로그인 버튼이 보여야 하므로)
+        if(!session) {
+            setSupabase(null)
+            setIsLoaded(true)
+            return;
+        }
 
         const client = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
