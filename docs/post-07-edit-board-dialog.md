@@ -1,7 +1,7 @@
 # Trello Clone 클론 코딩 (7) — Dialog로 보드 제목과 색상 바꾸기
 
 참고 영상: https://www.youtube.com/watch?v=ugxI1o5SyMs
-영상 구간: `??:??:??` 보드 수정 Dialog
+영상 구간: `03:50:00` Board Page Header & "Edit Board" Dialog
 
 (6)편에서 보드 상세 페이지 헤더에 **⋯ 버튼** 자리를 만들어 두었다. 하지만 페이지에서 `onEditBoard` 를 넘기지 않아서 버튼이 보이지 않았다.
 이번 글에서는 그 버튼을 누르면 **Dialog(모달 창)** 가 열리고, 보드 **제목과 색상**을 바꿔 저장하는 기능을 만든다.
@@ -150,7 +150,7 @@ const [newColor, setNewColor] = useState("")
 
 ## 4. Dialog 그리기
 
-shadcn의 `Dialog`, `Input`, `Label` 을 쓴다. (2)편에서 `npx shadcn add` 로 받아 둔 컴포넌트다.
+shadcn의 `Dialog`, `Input`, `Label` 을 쓴다. (1)편에서 `npx shadcn add` 로 받아 둔 컴포넌트다.
 
 ```tsx
 import { Button } from "@/components/ui/button";
