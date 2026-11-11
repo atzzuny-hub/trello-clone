@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs"
 import { useEffect, useState } from "react";
-import { Board, Column, ColumnWithTasks } from "../supabase/models";
+import { Board, Column, ColumnWithTasks, Task } from "../supabase/models";
 import { boardDataService, boardService, taskService } from "../services";
 import { useSupabase } from "../supabase/SupabaseProvider";
 import { describe } from "node:test";
@@ -137,12 +137,49 @@ export function useBoard(boardId: string){
         }
     }
 
+    async function moveTask(
+        taskId: string, 
+        newColumnId: string, 
+        newOrder:number
+    ){
+        try{
+            await taskService.moveTask(supabase!, taskId, newColumnId, newOrder)
+            
+            setColumns((prev) => {
+                const newColumns = [...prev]
+
+                let taskToMove : Task | null = null;
+                for(const col of newColumns) {
+                    const taskIndex = col.tasks.findIndex((task) => task.id === taskId)
+                    if(taskIndex !== -1){
+                        taskToMove = col.tasks[taskIndex]
+                        col.tasks.splice(taskIndex, 1)
+                        break
+                    }
+                }
+
+                if(taskToMove){
+                    const targetColumn = newColumns.find((col) => col.id === newColumnId);
+
+                    if(targetColumn){
+                        targetColumn.tasks.splice(newOrder, 0, taskToMove)
+                    }
+                }
+                return newColumns
+            })
+        }catch(err){
+            setError(err instanceof Error ? err.message : "태스크 이동에 실패했습니다.")
+        } 
+    }
+
     return{
         board,
         columns,
         loading,
         error,
         updateBoard,
-        createRealTask
+        createRealTask,
+        setColumns,
+        moveTask
     }
 }
