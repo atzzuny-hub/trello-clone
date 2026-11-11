@@ -18,7 +18,8 @@
 | `03:50:00` | 보드 수정 Dialog — 제목·색상 변경(`updateBoard`), 새 컴퓨터 설정 에러 정리 | 완료 | [docs/post-07-edit-board-dialog.md](docs/post-07-edit-board-dialog.md) |
 | `03:59:55` | 보드 상세 — 태스크 불러오기(`getTasksByBoard`, `ColumnWithTasks`), 컬럼 그리기, Filter·Add Task Dialog(모양만) | 완료 | [docs/post-08-columns-tasks.md](docs/post-08-columns-tasks.md) |
 | `04:00:03` | 태스크 만들기(`createTask` → `createRealTask` → `taskService.createTask`), TaskCard(담당자·마감일·우선순위 색), 컬럼 가로 스크롤 | 완료 | [docs/post-09-create-task.md](docs/post-09-create-task.md) |
-| 다음 | 컬럼별 Add Card, 드래그 앤 드롭, 필터 동작, `/dashboard` 로그인 보호 | 예정 | |
+| `04:27:00` | 컬럼마다 Add Task 버튼 — 컬럼 안 태스크 추가 Dialog, `onCreateTask` 를 `handleCreateTask` 로 교체 | 완료 | [docs/post-10-column-add-task.md](docs/post-10-column-add-task.md) |
+| 다음 | 드래그 앤 드롭(dnd-kit, 정리 글 작성 중), 필터 동작, `/dashboard` 로그인 보호 | 예정 | |
 
 ### 다음에 할 일
 
