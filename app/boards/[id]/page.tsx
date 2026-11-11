@@ -50,6 +50,73 @@ function Column({
                 {/* Column Content */}
                 <div className="p-2">
                     {children}
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button variant="ghost" className="w-full mt-3 text-gray-500 hover:text-gray-700">
+                                <Plus/> Add Task
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="w-[95vw] max-w-[425px] mx-auto">
+                            <DialogHeader>
+                                <DialogTitle>Create New Task</DialogTitle>
+                                <p>
+                                    보드에 작업을 추가하세요
+                                </p>
+                            </DialogHeader>    
+
+                            <form className="space-y-4" onSubmit={onCreateTask}>
+                                <div className="space-y-2">
+                                    <Label>Title *</Label>
+                                    <Input
+                                        id="title"
+                                        name="title"
+                                        placeholder="작업 제목을 입력하세요"
+                                    />
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label>Description</Label>
+                                    <Textarea
+                                        id="description"
+                                        name="description"
+                                        placeholder="작업 설명을 입력하세요"
+                                        rows={3}
+                                    />
+                                </div>
+                                 <div className="space-y-2">
+                                    <Label>Assignee</Label>
+                                    <Input
+                                        id="assignee"
+                                        name="assignee"
+                                        placeholder="누가 이걸 해야 할까요?"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Priority</Label>
+                                    <Select name="priority" defaultValue="medium">
+                                        <SelectTrigger>
+                                            <SelectValue/>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {["low", "medium", "high"].map((priority, key) => (
+                                                <SelectItem key={key} value={priority}>
+                                                    {priority.charAt(0).toUpperCase() + priority.slice(1)}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <Label>Due Date</Label>
+                                    <Input type="date" id="dueDate" name="dueDate"/>
+                                </div>
+
+                                <div className="flex justify-end space-x-2 pt-4">
+                                    <Button type="submit">Create Task</Button>
+                                </div>
+                            </form>                            
+                        </DialogContent>    
+                    </Dialog>
                 </div>
             </div>
         </div>
@@ -381,7 +448,8 @@ export default function BoardPage(){
                         <Column
                             key={key}
                             column={column}
-                            onCreateTask={createTask} 
+                                // onCreateTask={createTask} 
+                                onCreateTask={handleCreateTask}
                             onEditColumn={() => { } } // 영상에서 컬럼 수정 함수 만들면 교체
                         >
                             <div className="space-y-3">
