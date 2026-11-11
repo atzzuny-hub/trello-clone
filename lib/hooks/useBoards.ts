@@ -3,7 +3,7 @@
 import { useUser } from "@clerk/nextjs"
 import { useEffect, useState } from "react";
 import { Board, Column, ColumnWithTasks, Task } from "../supabase/models";
-import { boardDataService, boardService, taskService } from "../services";
+import { boardDataService, boardService, columnService, taskService } from "../services";
 import { useSupabase } from "../supabase/SupabaseProvider";
 import { describe } from "node:test";
 
@@ -63,6 +63,7 @@ export function useBoards(){
 }
 
 export function useBoard(boardId: string){
+    const {user} = useUser()
     const {supabase} = useSupabase()
     const [board, setBoard] = useState<Board | null>(null)
     const [columns, setColumns] = useState<ColumnWithTasks[]>([])
@@ -172,6 +173,37 @@ export function useBoard(boardId: string){
         } 
     }
 
+    async function  createColumn(title:string) {
+        if(!board || !user) throw new Error("보드가 로드되지 않았습니다.")
+
+        try{
+            const newColumn = await columnService.createColumn(supabase!, {
+                title, 
+                board_id: board.id, 
+                sort_order: columns.length,
+                user_id: user?.id
+            })
+
+            setColumns((prev) => [...prev, {...newColumn, tasks: []}])
+            return newColumn
+
+        }catch(err){
+            setError(err instanceof Error ? err.message : "열을 생성하지 못했습니다.")
+        } 
+    }
+
+    async function updateColumn(columnId:string, title:string) {
+        try{
+            const updateColumn = await columnService.updateColumnTitle(supabase!, columnId, title)
+
+            setColumns((prev) => prev.map((col) => col.id === columnId ? {...col, ...updateColumn} : col))
+            return updateColumn
+            
+        }catch(err){
+            setError(err instanceof Error ? err.message : "열의 이름을 바꾸지 못했습니다.")
+        } 
+    }
+
     return{
         board,
         columns,
@@ -180,6 +212,8 @@ export function useBoard(boardId: string){
         updateBoard,
         createRealTask,
         setColumns,
-        moveTask
+        moveTask,
+        createColumn,
+        updateColumn
     }
 }
