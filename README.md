@@ -20,7 +20,8 @@
 | `04:00:03` | 태스크 만들기(`createTask` → `createRealTask` → `taskService.createTask`), TaskCard(담당자·마감일·우선순위 색), 컬럼 가로 스크롤 | 완료 | [docs/post-09-create-task.md](docs/post-09-create-task.md) |
 | `04:27:00` | 컬럼마다 Add Task 버튼 — 컬럼 안 태스크 추가 Dialog, `onCreateTask` 를 `handleCreateTask` 로 교체 | 완료 | [docs/post-10-column-add-task.md](docs/post-10-column-add-task.md) |
 | `04:30:00` | 드래그 앤 드롭(dnd-kit) — `DndContext`·`useDroppable`·`useSortable`·`DragOverlay`, 카드 옮기기 저장(`moveTask`), tasks UPDATE RLS 정책 수정 | 완료 | [docs/post-11-drag-and-drop.md](docs/post-11-drag-and-drop.md) |
-| 다음 | 컬럼 추가·이름 바꾸기, 필터 동작, `/dashboard` 로그인 보호 | 예정 | |
+| `05:13:00` | 컬럼 추가(add another list → `createColumn`)와 컬럼 이름 바꾸기(⋯ 버튼 → `updateColumn`) | 완료 | [docs/post-12-column-create-edit.md](docs/post-12-column-create-edit.md) |
+| 다음 | 필터 동작, `/dashboard` 로그인 보호 | 예정 | |
 
 ### 다음에 할 일
 
