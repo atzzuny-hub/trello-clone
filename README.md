@@ -19,14 +19,15 @@
 | `03:59:55` | 보드 상세 — 태스크 불러오기(`getTasksByBoard`, `ColumnWithTasks`), 컬럼 그리기, Filter·Add Task Dialog(모양만) | 완료 | [docs/post-08-columns-tasks.md](docs/post-08-columns-tasks.md) |
 | `04:00:03` | 태스크 만들기(`createTask` → `createRealTask` → `taskService.createTask`), TaskCard(담당자·마감일·우선순위 색), 컬럼 가로 스크롤 | 완료 | [docs/post-09-create-task.md](docs/post-09-create-task.md) |
 | `04:27:00` | 컬럼마다 Add Task 버튼 — 컬럼 안 태스크 추가 Dialog, `onCreateTask` 를 `handleCreateTask` 로 교체 | 완료 | [docs/post-10-column-add-task.md](docs/post-10-column-add-task.md) |
-| 다음 | 드래그 앤 드롭(dnd-kit, 정리 글 작성 중), 필터 동작, `/dashboard` 로그인 보호 | 예정 | |
+| `04:30:00` | 드래그 앤 드롭(dnd-kit) — `DndContext`·`useDroppable`·`useSortable`·`DragOverlay`, 카드 옮기기 저장(`moveTask`), tasks UPDATE RLS 정책 수정 | 완료 | [docs/post-11-drag-and-drop.md](docs/post-11-drag-and-drop.md) |
+| 다음 | 컬럼 추가·이름 바꾸기, 필터 동작, `/dashboard` 로그인 보호 | 예정 | |
 
 ### 다음에 할 일
 
 - [ ] `middleware.ts` 에서 `createRouteMatcher` + `auth.protect()` 로 `/dashboard` 보호하기 (지금은 로그아웃 상태에서도 열림)
 - [x] Supabase 프로젝트 만들고 연결하기
 - [ ] 보드·리스트·카드 CRUD
-- [ ] dnd-kit 드래그 앤 드롭
+- [x] dnd-kit 드래그 앤 드롭
 - [ ] 완성 후: Clerk → Supabase Auth 로 바꾸기, Next.js 16 업그레이드
 
 ## 다른 컴퓨터에서 시작하기
