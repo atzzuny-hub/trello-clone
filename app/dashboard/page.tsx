@@ -37,13 +37,14 @@ export default function DashboardPage(){
         }
     })
 
-    const boardsWithTaskCount = boards.map((board: Board) => ({
-        ...board,
-        taskCount: 0
-    }))
+    // const boardsWithTaskCount = boards.map((board: Board) => ({
+    //     ...board,
+    //     taskCount: 0
+    // }))
 
     // const filteredBoards = boards.filter((board: Board) => {
-    const filteredBoards = boardsWithTaskCount.filter((board: Board) => {
+    // const filteredBoards = boardsWithTaskCount.filter((board: Board) => {
+    const filteredBoards = boards.filter((board) => {
         // 전체 보드리스트 타이틀에서 filter로 검색한 문자가 있는지 검색해 
         const matchesSearch = board.title.toLowerCase().includes(filters.search.toLowerCase())
 
@@ -55,7 +56,15 @@ export default function DashboardPage(){
             (!filters.dateRange.end || 
             new Date(board.created_at) <= new Date(filters.dateRange.end + "T23:59:59.999"))
 
-        return matchesSearch && matchesDateRange
+        const matchesTaskCount = 
+            // ( 최소가 없다  ||  태스크 수 >= 최소 )
+            (filters.taskCount.min === null || 
+            board.taskCount >= filters.taskCount.min) &&
+            // ( 최대가 없다  ||  태스크 수 <= 최대 )
+            (filters.taskCount.max === null || 
+            board.taskCount <= filters.taskCount.max)
+
+        return matchesSearch && matchesDateRange && matchesTaskCount
     })
 
     function clearFilters(){

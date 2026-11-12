@@ -1,3 +1,7 @@
+export type BoardWithTaskCount = Board & {
+    taskCount: number
+}
+
 export interface Board{
     id: string;
     title: string;

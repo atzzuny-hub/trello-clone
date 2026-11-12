@@ -2,10 +2,10 @@
 
 import { useUser } from "@clerk/nextjs"
 import { useEffect, useState } from "react";
-import { Board, Column, ColumnWithTasks, Task } from "../supabase/models";
+import { Board, BoardWithTaskCount, Column, ColumnWithTasks, Task } from "../supabase/models";
 import { boardDataService, boardService, columnService, taskService } from "../services";
 import { useSupabase } from "../supabase/SupabaseProvider";
-import { describe } from "node:test";
+
 
 
 
@@ -13,7 +13,8 @@ export function useBoards(){
 
     const {user} = useUser();
     const {supabase} = useSupabase()
-    const [boards, setBoards] = useState<Board[]>([])
+    // const [boards, setBoards] = useState<Board[]>([])
+    const [boards, setBoards] = useState<BoardWithTaskCount[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -53,7 +54,8 @@ export function useBoards(){
                 userId: user?.id
                 }
             )
-            setBoards((prev) => [newBoard, ...prev])
+            // setBoards((prev) => [newBoard, ...prev])
+            setBoards((prev) => [{...newBoard, taskCount: 0}, ...prev])
         }catch(err){
             setError(err instanceof Error ? err.message : "보드를 생성하지 못했습니다.")
         }
