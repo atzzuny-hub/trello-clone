@@ -21,8 +21,8 @@
 | `04:27:00` | 컬럼마다 Add Task 버튼 — 컬럼 안 태스크 추가 Dialog, `onCreateTask` 를 `handleCreateTask` 로 교체 | 완료 | [docs/post-10-column-add-task.md](docs/post-10-column-add-task.md) |
 | `04:30:00` | 드래그 앤 드롭(dnd-kit) — `DndContext`·`useDroppable`·`useSortable`·`DragOverlay`, 카드 옮기기 저장(`moveTask`), tasks UPDATE RLS 정책 수정 | 완료 | [docs/post-11-drag-and-drop.md](docs/post-11-drag-and-drop.md) |
 | `05:13:00` | 컬럼 추가(add another list → `createColumn`)와 컬럼 이름 바꾸기(⋯ 버튼 → `updateColumn`) | 완료 | [docs/post-12-column-create-edit.md](docs/post-12-column-create-edit.md) |
-| `??:??:??` | 보드 상세 태스크 필터 — priority 버튼·Due Date, `filterCount`, Clear Filters, `filteredColumns` | 코드 완료, 글 예정 | |
-| `05:52:43` | 메인 보드(대시보드) 필터 | 다음 | |
+| `05:39:00` | 필터 — 보드 상세 태스크 필터(우선순위·마감일, `filterCount`, `filteredColumns`), 대시보드 보드 필터(제목·만든 날짜, `filteredBoards`), 태스크 수 필터(영상에 없음, `columns(tasks(count))`) | 완료 | [docs/post-13-filters.md](docs/post-13-filters.md) |
+| 다음 | `06:16:00` 이후(무료 플랜 제한·업그레이드 팝업), Vercel 배포 | 예정 | |
 
 ### 다음에 할 일
 
@@ -34,7 +34,7 @@
 
 ### 태스크 필터 메모 (`app/boards/[id]/page.tsx`)
 
-- [ ] 태스크 필터 정리글(13편) 쓰기 — 영상 구간 시작 시간 확인 필요
+- [x] 태스크 필터 정리글(13편) 쓰기 → [docs/post-13-filters.md](docs/post-13-filters.md) (남은 것은 글의 14절)
 - 마감일 없는 카드는 Due Date 필터를 걸어도 계속 보인다(`filters.dueDate && task.due_date` 조건). 숨기려면 `if (filters.dueDate && task.due_date !== filters.dueDate) return false` — 둘 다 `"YYYY-MM-DD"` 글자라 `Date` 변환 없이 비교 가능
 - 컬럼 위 카드 개수(`column.tasks.length`)는 `filteredColumns` 기준이라 걸러진 개수로 보인다(의도된 동작)
 - `assignee` 필터는 상태만 있고 UI·걸러내기가 아직 없다. `filterCount` 에는 이미 포함됨
