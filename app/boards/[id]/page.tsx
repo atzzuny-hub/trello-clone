@@ -27,7 +27,7 @@ function DroppableColumn({
 }:{ 
     column: ColumnWithTasks;
     children: React.ReactNode;
-    onCreateTask: (taskData:any) => Promise<void>;
+    onCreateTask: (e: React.SubmitEvent<HTMLFormElement>) => Promise<void>;
     onEditColumn: (column:ColumnWithTasks) => void
 }){
 
@@ -335,7 +335,7 @@ export default function BoardPage(){
         await createRealTask(targetColumn.id, taskData)
     }
 
-    async function handleCreateTask(e:any) {
+    async function handleCreateTask(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault()
         const formData =new FormData(e.currentTarget)
         const taskData = {
